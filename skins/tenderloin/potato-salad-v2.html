@@ -1,0 +1,331 @@
+<!doctype html>
+<!-- © 2025 DinnerMath — Calculator code and design are proprietary.
+     Licensed for end-user viewing only via comesail.github.io. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DinnerMath — Potato Salad Quantity Calculator (Tenderloin ultratight)</title>
+<meta name="description" content="How much potato salad per person? Estimate pounds to buy for homemade (raw potatoes, unpeeled) and about tubs for store-bought, with optional pricing.">
+<style>
+  :root{ --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --bg:#ffffff; --card:#ffffff; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial}
+  .wrap{max-width:740px;margin:0 auto;padding:clamp(8px,1.6vw,14px)}
+  .dm-card{background:var(--card);border:1px solid var(--line);border-radius:0px;padding:10px;margin:8px 0;box-shadow:0 1px 0 rgba(17,24,39,.06),0 1px 2px rgba(17,24,39,.05)}
+  h1{font-size:20px;margin:0 0 6px;text-align:center;font-weight:800}
+  h3{font-size:15px;margin:0 0 6px;text-align:center;font-weight:800}
+  .lede{color:var(--muted);margin:0 0 8px;text-align:center;font-weight:400;font-size:12.5px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  @media (max-width:820px){.row{grid-template-columns:1fr}}
+  label{font-size:10.5px;color:#374151;display:block;margin:0 0 2px;font-weight:600;text-align:left}
+  input[type='number'],select{width:100%;border:1px solid #d1d5db;border-radius:7px;padding:6px 8px;font-size:12.5px;line-height:1.2;background:#fff;color:var(--ink)}
+  .muted{color:var(--muted);font-size:11px}
+  .fine{font-size:12.5px;color:#374151;line-height:1.35}
+  .inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .divider{height:1px;background:var(--line);margin:8px 0}
+  .btn{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:700;text-decoration:none;color:var(--ink);cursor:pointer;background:#fff}
+  .btn:hover{background:#f3f4f6}
+  .btn:focus-visible, .preset:focus-visible{outline:3px solid #94a3b8;outline-offset:2px}
+  .pill{font-size:10px;border:1px solid #d1d5db;border-radius:999px;padding:2px 6px;color:#475569;background:#fff;text-decoration:none}
+  .preset{border:2px solid var(--ink);background:#f8fafc;border-radius:999px;padding:5px 10px;font-size:13px;font-weight:800;cursor:pointer}
+  .preset:hover{background:#eef2f7}
+  .result{border:2px solid var(--ink);border-radius:0px;padding:10px;margin-top:6px;background:#fff}
+  .result .big{font-size:24px;font-weight:800;line-height:1.2;color:var(--ink);font-variant-numeric:tabular-nums}
+  .finder{padding:8px;border-radius:0px;border:2px solid var(--ink);background:#fff}
+  .visually-hidden{position:absolute!important;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;width:1px;overflow:hidden;white-space:nowrap;border:0;padding:0;margin:-1px}
+  [aria-label='Guests']{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end}
+  [aria-label='Guests']>div{flex:0 0 auto}
+  #A,#T,#C{width:110px}
+  [aria-label='Guests']>div:nth-child(4){flex:1 1 240px;min-width:220px}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:820px){ .row-2{grid-template-columns:1fr} }
+  a, a:visited{color:var(--ink)}
+</style>
+</head>
+<body class="ultra">
+  <div class="wrap" id="potato-salad">
+
+    <div class="dm-card" role="region" aria-label="Header">
+      <h1>Potato Salad Quantity Calculator — Pounds per Person</h1>
+      <p class="lede">
+        Enter guests and settings (or tap a quick preset). We will estimate <strong>pounds of potato salad</strong> to buy for <strong>homemade (raw potatoes, unpeeled)</strong> and show an <strong>about tub count</strong> for store-bought (planning estimate).
+      </p>
+    </div>
+
+    <div class="dm-card" role="region" aria-label="Inputs">
+      <h3>Inputs</h3>
+      <div class="row" aria-label="Guests">
+        <div><label for="A">Adults</label><input id="A" type="number" min="0" step="1" inputmode="numeric" value="10" autofocus></div>
+        <div><label for="T">Teens</label><input id="T" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+        <div><label for="C">Children</label><input id="C" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+        <div>
+          <label for="course">Course mode</label>
+          <select id="course">
+            <option value="main">Main dish</option>
+            <option value="mixed" selected>Mixed buffet</option>
+            <option value="app">Appetizer/snack</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" aria-label="Context">
+        <div>
+          <label for="appetite">Appetite</label>
+          <select id="appetite">
+            <option value="0.90">Light</option>
+            <option value="1.00" selected>Typical</option>
+            <option value="1.20">Hearty</option>
+          </select>
+        </div>
+        <div>
+          <label for="length">Event length</label>
+          <select id="length">
+            <option value="0.95">Short - about 1 to 2 hours</option>
+            <option value="1.00" selected>Standard - about 2 to 3 hours</option>
+            <option value="1.08">Long - about 3 to 4 hours</option>
+            <option value="1.15">Extended - about 4 to 5 hours</option>
+          </select>
+        </div>
+        <div>
+          <label for="leftovers">Add leftovers</label>
+          <select id="leftovers">
+            <option value="1.00" selected>No</option>
+            <option value="1.10">+10%</option>
+            <option value="1.20">+20%</option>
+          </select>
+        </div>
+        <div>
+          <label for="buying">Buying</label>
+          <select id="buying">
+            <option value="homemade" selected>Homemade (raw potatoes, unpeeled)</option>
+            <option value="store">Store-bought (by the tub)</option>
+          </select>
+          <div class="muted">Homemade uses raw whole potatoes. Rule of thumb: 1 medium potato is about 0.33 lb (about 3 per lb).</div>
+        </div>
+        <div>
+          <label for="tubSize">Store tub size</label>
+          <select id="tubSize">
+            <option value="1" selected>Small - about 1 lb</option>
+            <option value="2">Medium - about 2 lb</option>
+            <option value="5">Party - about 5 lb</option>
+          </select>
+          <div class="muted">Store-bought: we convert pounds to an about tub count.</div>
+        </div>
+      </div>
+
+      <div class="inline" style="margin-top:6px">
+        <span class="muted">Quick presets:</span>
+        <button class="preset" data-people="10" type="button">10</button>
+        <button class="preset" data-people="25" type="button">25</button>
+        <button class="preset" data-people="50" type="button">50</button>
+        <button class="preset" data-people="100" type="button">100</button>
+        <span class="muted">Presets set all as adults. Tweak Teens and Children if needed.</span>
+        <div style="flex:1"></div>
+        <button id="dmReset" type="button" class="btn">Reset</button>
+      </div>
+    </div>
+
+    <div class="muted" id="outMicro" style="margin:6px 0 0 0">-</div>
+
+    <div class="dm-card" role="region" aria-label="Results" aria-live="polite" aria-atomic="true">
+      <h3>Results (estimate)</h3>
+      <div class="result">
+        <div class="muted" aria-hidden="true">Estimated pounds to buy</div>
+        <div class="big" id="outRaw" aria-label="No estimate yet">-</div>
+        <div class="fine">About whole potatoes: <span id="outPotatoes">-</span></div>
+        <div class="fine">About tubs (store-bought): <span id="outTubs">-</span></div>
+        <div class="fine" id="outFrom">-</div>
+        <div class="fine" id="outExplain">Enter your guest mix to calculate.</div>
+        <div class="divider"></div>
+        <div class="inline">
+          <span class="pill" id="pillGuests">-</span>
+          <span class="pill" id="pillBasis">-</span>
+          <span class="pill" id="pillPrice">pricing optional</span>
+        </div>
+      </div>
+      <span id="outGuests" class="visually-hidden">-</span>
+
+      <div class="row-2" style="margin-top:10px">
+        <div class="dm-card" style="margin:0">
+          <h3>Cost estimate</h3>
+          <div class="inline">
+            <div><label>Subtotal</label><div id="outSubtotal" class="fine">$-</div></div>
+            <div><label>Tax and fees</label><div id="outAdds" class="fine">$-</div></div>
+            <div><label>Estimated total</label><div id="outTotal" class="fine">$-</div></div>
+            <div><label>Per person</label><div id="outPPP" class="fine">$-</div></div>
+          </div>
+        </div>
+        <div class="dm-card finder" role="region" aria-label="Find near me" style="margin:0">
+          <div class="inline">
+            <a class="btn" href="#" onclick="try{window.open('https://www.google.com/maps/search/potato+salad+near+me','_blank');}catch(e){location.href='https://www.google.com/maps/search/potato+salad+near+me';}return false;">Find potato salad near me</a>
+            <a class="pill" href="#" onclick="try{window.open('https://www.google.com/maps/search/deli+counter','_blank');}catch(e){location.href='https://www.google.com/maps/search/deli+counter';}return false;">Deli counters</a>
+            <a class="pill" href="#" onclick="try{window.open('https://www.google.com/maps/search/grocery+store','_blank');}catch(e){location.href='https://www.google.com/maps/search/grocery+store';}return false;">Grocery stores</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dm-card" role="region" aria-label="Pricing">
+      <h3>Pricing (optional)</h3>
+      <div class="row">
+        <div>
+          <label for="priceBasis">Price basis</label>
+          <select id="priceBasis">
+            <option value="pound" selected>Per pound</option>
+            <option value="tub">Per tub</option>
+          </select>
+        </div>
+        <div><label for="priceLb">Unit price (US dollars per pound)</label><input id="priceLb" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 0.99"></div>
+        <div><label for="priceTub">Price per tub (US dollars)</label><input id="priceTub" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 5.99"></div>
+        <div><label for="taxPct">Sales tax (percent)</label><input id="taxPct" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g., 7.5"></div>
+        <div><label for="fees">Extra fees (US dollars)</label><input id="fees" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 8.00"></div>
+      </div>
+      <div class="muted">Homemade: subtotal = raw potato pounds × price per lb. Store-bought: subtotal = about tubs × price per tub. Then we add tax and fees.</div>
+    </div>
+
+  </div>
+
+  <script>
+  (function(){
+    const $ = id => document.getElementById(id);
+    const N = (v,d=0)=>{const n=parseFloat(v);return isFinite(n)?n:d;};
+    const money = n => (isFinite(n)&&n>=0) ? "$"+n.toFixed(2) : "$-";
+    const fmt = (n,d=0)=> isFinite(n) ? n.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}) : "-";
+    const roundQtr = lbs => Math.round(lbs*4)/4;
+
+    function courseMult(c){ if(c==="main") return 1.30; if(c==="app") return 0.60; return 1.00; }
+    function lenMult(v){ if(v==1.15) return 1.15; if(v==1.08) return 1.08; if(v==0.95) return 0.95; return 1.00; }
+
+    // compute(): IDs/logic preserved from original file
+    function compute(){ 
+      const A=N($("A").value,0), T=N($("T").value,0), C=N($("C").value,0);
+      const guests = A+T+C;
+      const course = $("course").value;
+      const appetite = N($("appetite").value,1.0);
+      const length   = N($("length").value,1.0);
+      const leftovers= N($("leftovers").value,1.0);
+      const buying   = $("buying").value;
+      const tubSize  = Math.max(0.25, N($("tubSize").value,1.0));
+
+      const base = {adult:5.0, teen:4.0, child:3.0};
+      let ounces = (A*base.adult + T*base.teen + C*base.child);
+      ounces *= courseMult(course) * appetite * lenMult(length) * leftovers;
+
+      const pounds = ounces/16.0;
+      const rawRounded = roundQtr(Math.max(0, pounds));
+      const tubs = (tubSize>0) ? Math.max(0, Math.ceil(rawRounded / tubSize)) : 0;
+      const potatoes = Math.max(0, Math.round(rawRounded * 3));
+
+      // Pricing (unchanged)
+      const basis = $("priceBasis").value;
+      const priceLb = N($("priceLb").value,0);
+      const priceTub = N($("priceTub").value,0);
+      const tax = N($("taxPct").value,0)/100;
+      const fees = N($("fees").value,0);
+
+      let subtotal = 0;
+      if(basis==="tub"){ subtotal = (priceTub>0 && tubs>0) ? tubs * priceTub : 0; }
+      else{ subtotal = (priceLb>0 && rawRounded>0) ? rawRounded * priceLb : 0; }
+
+      const adds = subtotal * tax + (fees>0?fees:0);
+      const total = subtotal + adds;
+      const ppp = (guests>0 && total>0) ? total/guests : NaN;
+
+      return {guests, rawRounded, tubs, potatoes, subtotal, adds, total, ppp, basis, buying, course, appetite, length, leftovers, tubSize};
+    }
+
+    function render(){ 
+      const s = compute();
+
+      // Micro-summary
+      const courseTxt = $("course").selectedOptions[0].text.toLowerCase();
+      const appetiteTxt = $("appetite").selectedOptions[0].text.toLowerCase();
+      const lengthTxt = $("length").selectedOptions[0].text.toLowerCase();
+      const leftTxt = $("leftovers").selectedOptions[0].text.toLowerCase();
+      const basisTxt = $("priceBasis").selectedOptions[0].text.toLowerCase();
+      const buyTxt = $("buying").selectedOptions[0].text.toLowerCase();
+      document.getElementById('outMicro').textContent = s.guests>0
+        ? (s.guests + ' guests • ' + courseTxt + ' • ' + appetiteTxt + ' appetite • ' + lengthTxt + ' • leftovers ' + leftTxt + ' • ' + buyTxt)
+        : '-';
+
+      // Results
+      $("outGuests").textContent    = s.guests>0 ? s.guests.toString() : "-";
+      const rawText = (s.guests>0) ? (fmt(s.rawRounded,(s.rawRounded%1)?2:0) + " lb") : "-";
+      $("outRaw").textContent       = rawText;
+      $("outRaw").setAttribute('aria-label', s.guests>0 ? ('Estimated pounds to buy: ' + fmt(s.rawRounded,(s.rawRounded%1)?2:0)) : 'No estimate yet');
+      $("outPotatoes").textContent  = s.guests>0 ? s.potatoes.toLocaleString() : "-";
+      $("outTubs").textContent      = s.guests>0 ? s.tubs.toLocaleString() : "-";
+      $("outSubtotal").textContent  = s.subtotal>0 ? money(s.subtotal) : "$-";
+      $("outAdds").textContent      = s.subtotal>0 ? money(s.adds) : "$-";
+      $("outTotal").textContent     = s.subtotal>0 ? money(s.total) : "$-";
+      $("outPPP").textContent       = (s.total>0 && s.guests>0) ? money(s.ppp) : "$-";
+      $("outExplain").textContent   = s.guests>0
+        ? (s.basis==="tub" ? "Pricing by tub: tubs × price per tub + tax and fees." : "Pricing by pound: raw potato pounds × price per lb + tax and fees.")
+        : "Enter your guest mix to calculate.";
+      document.getElementById('outFrom').textContent = s.guests>0
+        ? ('Estimated from ' + s.guests + ' guests - ' + courseTxt + ', ' + buyTxt + ', ' + appetiteTxt + ' appetite, ' + lengthTxt + ', leftovers ' + leftTxt + '.')
+        : '-';
+
+      // Pills
+      document.getElementById('pillGuests').textContent = s.guests>0 ? (s.guests + ' guests total') : '-';
+      document.getElementById('pillBasis').textContent  = s.guests>0 ? (buyTxt + ', price ' + basisTxt) : '-';
+      document.getElementById('pillPrice').textContent  = (s.total>0 && s.guests>0) ? ('about ' + money(s.ppp) + ' per person') : 'pricing optional';
+    }
+
+    ["A","T","C","course","appetite","length","leftovers","buying","tubSize","priceBasis","priceLb","priceTub","taxPct","fees"]
+      .forEach(id=>{ const el=$(id); if(el){el.addEventListener("input",render); el.addEventListener("change",render);} });
+
+    // Stronger select-all for A/T/C (click and focus)
+    ["A","T","C"].forEach(id=>{
+      const el=$(id); if(!el) return;
+      const selAll = ()=>{ try{ el.select(); }catch(e){} };
+      el.addEventListener("focus", selAll);
+      el.addEventListener("click", selAll);
+      el.addEventListener("mouseup", (e)=>{ e.preventDefault(); selAll(); });
+      el.addEventListener("touchend", selAll, {passive:true});
+    });
+
+    // Presets
+    document.querySelectorAll(".preset[data-people]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const n=parseInt(btn.getAttribute("data-people"),10)||0;
+        $("A").value=n; $("T").value=0; $("C").value=0;
+        const a=$("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){}
+        render();
+      });
+    });
+
+    // Reset
+    (function(){
+      const btn=$("dmReset"); if(!btn) return;
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll("input, select").forEach(el=>{
+          if(el.tagName==='SELECT'){
+            const i = Array.from(el.options).findIndex(o=>o.defaultSelected);
+            el.selectedIndex = i>=0 ? i : 0;
+          } else { el.value = el.defaultValue; }
+        });
+        document.querySelectorAll("input, select").forEach(el=>{
+          el.dispatchEvent(new Event("input",{bubbles:true}));
+          el.dispatchEvent(new Event("change",{bubbles:true}));
+        });
+        const a=$("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){}
+        render();
+      });
+    })();
+
+    // Start
+    const start = () => { const a=$("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){} render(); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once:true});
+    else start();
+  })();
+  </script>
+
+  <div class="muted" style="text-align:center;margin:16px 0 0 0;">
+    This tool provides general portion and cost estimates for planning only. Results depend on the information you enter and typical averages. DinnerMath is not responsible for decisions, purchases, or outcomes based on these estimates.<br>
+    © 2025 DinnerMath. All rights reserved. Use for planning only.
+  </div>
+</body>
+</html>
