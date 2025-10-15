@@ -50,7 +50,7 @@
     <div class="dm-card" role="region" aria-label="Inputs">
       <h3>Inputs</h3>
       <div class="guest-grid" aria-label="Guests">
-        <div><label for="A">Adults</label><input id="A" type="number" min="0" step="1" value="10"></div>
+        <div><label for="A">Adults</label><input id="A" type="number" min="0" step="1" value="10" autofocus></div>
         <div><label for="T">Teens</label><input id="T" type="number" min="0" step="1" value="0"></div>
         <div><label for="C">Children</label><input id="C" type="number" min="0" step="1" value="0"></div>
         <div>
@@ -290,6 +290,24 @@
       const el=$(id); if(el){ el.addEventListener("input",render); el.addEventListener("change",render); }
     });
 
+    
+    // Wire quick presets
+    (function attachPresets(){
+      try{
+        document.querySelectorAll("button.preset").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            var n = parseInt(btn.getAttribute("data-people")||"0",10);
+            var A = document.getElementById("A");
+            var T = document.getElementById("T");
+            var C = document.getElementById("C");
+            if(A){ A.value = isFinite(n)? n : 0; A.dispatchEvent(new Event("input",{bubbles:true})); A.dispatchEvent(new Event("change",{bubbles:true})); }
+            if(T){ T.value = 0; T.dispatchEvent(new Event("input",{bubbles:true})); T.dispatchEvent(new Event("change",{bubbles:true})); }
+            if(C){ C.value = 0; C.dispatchEvent(new Event("input",{bubbles:true})); C.dispatchEvent(new Event("change",{bubbles:true})); }
+          }, {passive:true});
+        });
+      }catch(_){}
+    })();
+    
     (function attachReset(){
       const btn=document.getElementById("dmReset"); if(!btn) return;
       btn.addEventListener("click", ()=>{
@@ -317,5 +335,31 @@
     DinnerMath is not responsible for decisions, purchases, or outcomes based on these estimates.<br>
     © 2025 DinnerMath. All rights reserved. Use for planning only.
   </div>
+
+<script>
+// Robust select-all for Adults/Teens/Children (A,T,C) + autofocus on A
+(function(){
+  function wire(id){
+    var el = document.getElementById(id);
+    if(!el || el._dmSelectAll) return;
+    el._dmSelectAll = true;
+    function sel(){ try{ el.select(); }catch(e){} }
+    el.addEventListener("focus", function(){ setTimeout(sel, 0); });
+    el.addEventListener("click", sel);
+    el.addEventListener("mouseup", function(e){ e.preventDefault(); });
+    el.addEventListener("touchend", function(){ sel(); });
+  }
+  function start(){
+    ["A","T","C"].forEach(wire);
+    try{ var a=document.getElementById("A"); if(a){ a.focus({preventScroll:true}); a.select(); } }catch(_){}
+  }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", start, {once:true});
+  } else {
+    start();
+  }
+})();
+</script>
+
 </body>
 </html>
