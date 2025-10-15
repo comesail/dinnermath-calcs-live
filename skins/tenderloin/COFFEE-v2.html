@@ -1,0 +1,350 @@
+<!doctype html>
+<!-- © 2025 DinnerMath — Calculator code and design are proprietary. Licensed for end-user viewing only via comesail.github.io. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DinnerMath — Coffee Quantity Calculator (Tenderloin ultratight)</title>
+<meta name="description" content="How much hot or iced coffee per person? Estimate cups to serve, and how many gallons, travelers, and grounds to buy. Includes pricing with tax and fees.">
+<style>
+  :root{ --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --bg:#ffffff; --card:#ffffff; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+  .wrap{max-width:740px;margin:0 auto;padding:clamp(8px,1.6vw,14px)}
+  .dm-card{background:var(--card);border:1px solid var(--line);border-radius:0px;padding:10px;margin:8px 0;box-shadow:0 1px 0 rgba(17,24,39,.06),0 1px 2px rgba(17,24,39,.05)}
+  h1{font-size:20px;margin:0 0 6px;text-align:center;font-weight:800}
+  h3{font-size:15px;margin:0 0 6px;text-align:center;font-weight:800}
+  .lede{color:var(--muted);margin:0 0 8px;text-align:center;font-weight:400;font-size:12.5px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  @media (max-width:820px){.row{grid-template-columns:1fr}}
+  label{font-size:10.5px;color:#374151;display:block;margin:0 0 2px;font-weight:600;text-align:left}
+  input[type="number"],select{width:100%;border:1px solid #d1d5db;border-radius:7px;padding:6px 8px;font-size:12.5px;line-height:1.2;background:#fff;color:var(--ink)}
+  .muted{color:var(--muted);font-size:11px}
+  .fine{font-size:12.5px;color:#374151;line-height:1.35}
+  .inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .divider{height:1px;background:var(--line);margin:8px 0}
+  .btn{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:700;text-decoration:none;color:var(--ink);cursor:pointer;background:#fff}
+  .btn:hover{background:#f3f4f6}
+  .btn:focus-visible, .preset:focus-visible{outline:3px solid #94a3b8;outline-offset:2px}
+  .pill{font-size:10px;border:1px solid #d1d5db;border-radius:999px;padding:2px 6px;color:#475569;background:#fff;text-decoration:none}
+  .preset{border:2px solid var(--ink);background:#f8fafc;border-radius:999px;padding:5px 10px;font-size:13px;font-weight:800;cursor:pointer}
+  .preset:hover{background:#eef2f7}
+  .result{border:2px solid var(--ink);border-radius:0px;padding:10px;margin-top:6px;background:#fff}
+  .result .big{font-size:24px;font-weight:800;line-height:1.2;color:var(--ink);font-variant-numeric:tabular-nums}
+  .finder{padding:8px;border-radius:0px;border:2px solid var(--ink);background:#fff}
+  .visually-hidden{position:absolute!important;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;width:1px;overflow:hidden;white-space:nowrap;border:0;padding:0;margin:-1px}
+  [aria-label="Guests"]{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end}
+  [aria-label="Guests"]>div{flex:0 0 auto}
+  #A,#T,#C{width:110px}
+  [aria-label="Guests"]>div:nth-child(4){flex:1 1 240px;min-width:220px}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:820px){ .row-2{grid-template-columns:1fr} }
+  a, a:visited{color:var(--ink)}
+</style>
+</head>
+<body class="ultra">
+  <div class="wrap" id="coffee">
+
+    <!-- Header -->
+    <div class="dm-card" role="region" aria-label="Header">
+      <h1>Coffee Quantity Calculator — Hot & Iced</h1>
+      <p class="lede">
+        Enter guests and settings (or tap a quick preset). We will estimate how many <strong>cups</strong> to serve (planning estimate) and how many <strong>gallons</strong>, <strong>96‑oz travelers</strong>, and <strong>pounds of grounds</strong> to buy.
+      </p>
+    </div>
+
+    <!-- Inputs -->
+    <div class="dm-card" role="region" aria-label="Inputs">
+      <h3>Inputs</h3>
+      <div class="row" aria-label="Guests">
+        <div><label for="A">Adults</label><input id="A" type="number" min="0" step="1" inputmode="numeric" value="10" autofocus></div>
+        <div><label for="T">Teens</label><input id="T" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+        <div><label for="C">Children</label><input id="C" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+        <div>
+          <label for="course">Course mode</label>
+          <select id="course">
+            <option value="side" selected>Side coffee</option>
+            <option value="entree">Main beverage</option>
+            <option value="party">All-morning service</option>
+            <option value="tasting">Tasting flight</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" aria-label="Context">
+        <div>
+          <label for="length">Event length</label>
+          <select id="length">
+            <option value="0.95">Short - about 1 to 2 hours</option>
+            <option value="1.00" selected>Standard - about 2 to 3 hours</option>
+            <option value="1.08">Long - about 3 to 4 hours</option>
+            <option value="1.15">Extended - about 4 to 5 hours</option>
+          </select>
+        </div>
+        <div>
+          <label for="leftovers">Add leftovers</label>
+          <select id="leftovers">
+            <option value="1.00" selected>No</option>
+            <option value="1.10">+10%</option>
+            <option value="1.20">+20%</option>
+          </select>
+        </div>
+        <div>
+          <label for="appetite">Appetite</label>
+          <select id="appetite">
+            <option value="0.90">Light</option>
+            <option value="1.00" selected>Typical</option>
+            <option value="1.20">Hearty</option>
+          </select>
+        </div>
+        <div>
+          <label for="brewType">Coffee type</label>
+          <select id="brewType">
+            <option value="hot" selected>Hot coffee</option>
+            <option value="iced">Iced coffee</option>
+          </select>
+          <div class="muted">Iced mode adds melt buffer and a stronger grounds ratio.</div>
+        </div>
+        <div>
+          <label for="cup">Serving size (cup)</label>
+          <select id="cup">
+            <option value="8">Small - 8 oz cup</option>
+            <option value="12" selected>Average - 12 oz cup</option>
+            <option value="16">Large - 16 oz cup</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="inline" style="margin-top:6px">
+        <span class="muted">Quick presets:</span>
+        <button class="preset" data-people="10" type="button">10</button>
+        <button class="preset" data-people="25" type="button">25</button>
+        <button class="preset" data-people="50" type="button">50</button>
+        <button class="preset" data-people="100" type="button">100</button>
+        <span class="muted">Presets set all as adults. Tweak Teens and Children if needed.</span>
+        <div style="flex:1"></div>
+        <button id="dmReset" type="button" class="btn">Reset</button>
+      </div>
+    </div>
+
+    <!-- Micro-summary -->
+    <div class="muted" id="outMicro" style="margin:6px 0 0 0">-</div>
+
+    <!-- Results -->
+    <div class="dm-card" role="region" aria-label="Results" aria-live="polite" aria-atomic="true">
+      <h3>Results (estimate)</h3>
+      <div class="result">
+        <div class="muted" aria-hidden="true">Estimated gallons to buy</div>
+        <div class="big" id="outBig" aria-label="No estimate yet">-</div>
+        <div class="fine" id="outLines">-</div>
+        <div class="fine" id="outFrom">-</div>
+        <div class="divider"></div>
+        <div class="inline">
+          <span class="pill" id="pillGuests">-</span>
+          <span class="pill" id="pillType">-</span>
+          <span class="pill" id="pillCup">-</span>
+          <span class="pill" id="pillCourse">-</span>
+          <span class="pill" id="pillPrice">pricing optional</span>
+        </div>
+      </div>
+      <span id="outGuests" class="visually-hidden">-</span>
+
+      <div class="row-2" style="margin-top:10px">
+        <div class="dm-card" style="margin:0">
+          <h3>Cost estimate</h3>
+          <div class="inline">
+            <div><label>Subtotal</label><div id="outSubtotal" class="fine">$-</div></div>
+            <div><label>Tax and fees</label><div id="outAdds" class="fine">$-</div></div>
+            <div><label>Estimated total</label><div id="outTotal" class="fine">$-</div></div>
+            <div><label>Per person</label><div id="outPPP" class="fine">$-</div></div>
+          </div>
+        </div>
+        <div class="dm-card finder" role="region" aria-label="Find near me" style="margin:0">
+          <div class="inline">
+            <a class="btn" href="#" onclick="try{window.open('https://www.google.com/maps/search/coffee+traveler+near+me','_blank');}catch(e){location.href='https://www.google.com/maps/search/coffee+traveler+near+me';}return false;">Find coffee near me</a>
+            <a class="pill" href="#" onclick="try{window.open('https://www.google.com/maps/search/cafe','_blank');}catch(e){location.href='https://www.google.com/maps/search/cafe';}return false;">Cafes</a>
+            <a class="pill" href="#" onclick="try{window.open('https://www.google.com/maps/search/grocery+store','_blank');}catch(e){location.href='https://www.google.com/maps/search/grocery+store';}return false;">Grocery stores</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing (optional) -->
+    <div class="dm-card" role="region" aria-label="Pricing">
+      <h3>Pricing (optional)</h3>
+      <div class="row">
+        <div>
+          <label for="priceMode">Pricing mode</label>
+          <select id="priceMode">
+            <option value="per_gal" selected>Per brewed gallon</option>
+            <option value="per_traveler">Per 96‑oz traveler</option>
+            <option value="per_lb_grounds">Per lb of ground coffee</option>
+          </select>
+        </div>
+        <div>
+          <label for="priceUnit">Unit price</label>
+          <input id="priceUnit" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 18.00">
+          <div class="muted" id="unitExplain">Enter dollars per selected unit.</div>
+        </div>
+        <div><label for="taxPct">Sales tax (percent)</label><input id="taxPct" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g., 7.5"></div>
+        <div><label for="fees">Extra fees (US dollars)</label><input id="fees" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 10.00"></div>
+      </div>
+      <div class="muted">Subtotal = rounded units × unit price; then we add tax and fees.</div>
+    </div>
+
+  </div>
+
+  <!-- Calculator logic (preserve original IDs & math from COFFEE; UI-only render) -->
+  <script>
+  (function(){
+    const $=id=>document.getElementById(id);
+    const N=(v,d=0)=>{const n=parseFloat(v);return isFinite(n)?n:d;};
+    const money=n=>(isFinite(n)&&n>=0)?"$"+n.toFixed(2):"$-";
+    const lenMult=v=>(v==1.15?1.15:v==1.08?1.08:v==0.95?0.95:1.00);
+    function courseMult(mode){
+      if(mode==="side") return 1.00;
+      if(mode==="entree") return 1.40;
+      if(mode==="party") return 1.80;
+      return 0.60;
+    }
+    function compute(){
+      const A=N($("A").value,0), T=N($("T").value,0), C=N($("C").value,0);
+      const guests=A+T+C;
+      const appetite=N($("appetite").value,1.0);
+      const leftovers=N($("leftovers").value,1.0);
+      const length=N($("length").value,1.0);
+      const course=$("course").value;
+      const cup=N($("cup").value,12);
+      const brewType=$("brewType").value;
+      const base={adult:8, teen:10, child:6};
+      let ounces=(A*base.adult + T*base.teen + C*base.child);
+      ounces*=appetite*lenMult(length)*courseMult(course);
+      ounces*=leftovers;
+      if(brewType==="iced"){ ounces*=1.25; }
+      const ozRounded=Math.ceil(Math.max(0,ounces));
+      const liters = ozRounded * 0.0295735;
+      const gallons = ozRounded / 128.0;
+      const Ldisp = Math.round(liters*10)/10;
+      const Gdisp = Math.round(gallons*10)/10;
+      const cups = ozRounded>0 ? Math.ceil(ozRounded/cup) : 0;
+      const travelers = ozRounded>0 ? Math.ceil(ozRounded/96) : 0;
+      const ratio = (brewType==="iced") ? 13 : 16;
+      const groundsOz = ozRounded>0 ? Math.ceil(ozRounded/ratio) : 0;
+      const groundsLb = groundsOz/16.0;
+      const mode=($("priceMode")||{}).value||"per_gal";
+      const price=N($("priceUnit").value,0), tax=N($("taxPct").value,0)/100, fees=N($("fees").value,0);
+      let subtotal=0;
+      const billGallons = Math.ceil(gallons);
+      if(price>0){
+        if(mode==="per_gal"){ subtotal = billGallons * price; }
+        else if(mode==="per_traveler"){ subtotal = travelers * price; }
+        else if(mode==="per_lb_grounds"){ subtotal = Math.ceil(groundsLb*100)/100 * price; }
+      }
+      const adds=subtotal*tax + (fees>0?fees:0);
+      const total=subtotal+adds;
+      const ppp=(guests>0 && total>0)?total/guests:NaN;
+      return {guests, ozRounded, Ldisp, Gdisp, billGallons, cups, travelers, groundsOz, groundsLb, subtotal, adds, total, ppp, course, brewType, cup};
+    }
+    function render(){
+      // Select-all on focus for A/T/C
+      ["A","T","C"].forEach(id=>{
+        const el=$(id); if(el && !el._dmSel){ el._dmSel=true; el.addEventListener("focus",()=>{ try{ el.select(); }catch(e){} }); }
+      });
+
+      const s=compute();
+      // Big number and ARIA (gallons to buy)
+      $("outBig").textContent = s.guests>0 ? (s.billGallons>0 ? (s.billGallons + " gal") : "-") : "-";
+      $("outBig").setAttribute("aria-label", s.guests>0 ? ("Estimated gallons to buy: " + (s.billGallons>0?s.billGallons:0)) : "No estimate yet");
+
+      // Secondary lines summary
+      const lines = s.guests>0
+        ? ("about " + s.ozRounded + " oz • " + s.Ldisp.toFixed(1).replace(/\.0$/,'') + " L • brewed " + s.Gdisp.toFixed(1).replace(/\.0$/,'') + " gal • about " + s.cups + " cups • about " + s.travelers + " travelers • grounds " + (s.groundsOz>0? (s.groundsOz + " oz (~" + (s.groundsLb).toFixed(2) + " lb)") : "0 oz") )
+        : "-";
+      $("outLines").textContent = lines;
+
+      // Micro-summary chips + from sentence
+      const appetiteTxt = $("appetite").selectedOptions[0].text.toLowerCase();
+      const lengthTxt = $("length").selectedOptions[0].text.toLowerCase();
+      const leftTxt = $("leftovers").selectedOptions[0].text.toLowerCase();
+      const courseTxt = ({"side":"side coffee","entree":"main beverage","party":"all-morning service","tasting":"tasting flight"})[$("course").value] || "side coffee";
+      const typeTxt = $("brewType").selectedOptions[0].text.toLowerCase();
+      const cupTxt = $("cup").selectedOptions[0].text.toLowerCase();
+
+      $("outMicro").textContent = s.guests>0
+        ? (s.guests + " guests • " + courseTxt + " • " + typeTxt + " • " + appetiteTxt + " appetite • " + lengthTxt + " • leftovers " + leftTxt + " • " + cupTxt)
+        : "-";
+
+      $("outFrom").textContent = s.guests>0
+        ? ("Estimated from " + s.guests + " guests - " + courseTxt + ", " + typeTxt + ", " + appetiteTxt + " appetite, " + lengthTxt + ", leftovers " + leftTxt + ", " + cupTxt + ".")
+        : "-";
+
+      $("outGuests").textContent = s.guests>0 ? String(s.guests) : "-";
+      $("pillGuests").textContent = s.guests>0 ? (s.guests + " guests total") : "-";
+      $("pillType").textContent = s.guests>0 ? typeTxt : "-";
+      $("pillCup").textContent = s.guests>0 ? cupTxt : "-";
+      $("pillCourse").textContent = s.guests>0 ? courseTxt : "-";
+
+      // Cost outputs
+      $("outSubtotal").textContent = s.subtotal>0 ? money(s.subtotal) : "$-";
+      $("outAdds").textContent     = s.subtotal>0 ? money(s.adds) : "$-";
+      $("outTotal").textContent    = s.subtotal>0 ? money(s.total) : "$-";
+      $("outPPP").textContent      = (s.total>0 && s.guests>0) ? money(s.ppp) : "$-";
+      $("pillPrice").textContent   = (s.total>0 && s.guests>0) ? ("about " + money(s.ppp) + " per person") : "pricing optional";
+    }
+
+    ["A","T","C","course","length","leftovers","appetite","cup","brewType","priceMode","priceUnit","taxPct","fees"].forEach(id=>{
+      const el=$(id); if(el){ el.addEventListener("input",render); el.addEventListener("change",render); }
+    });
+
+    // Presets
+    document.querySelectorAll(".preset[data-people]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const n=parseInt(btn.getAttribute("data-people"),10)||0;
+        $("A").value=n; $("T").value=0; $("C").value=0;
+        try{ $("A").focus({preventScroll:true}); $("A").select(); }catch(e){}
+        render();
+      });
+    });
+
+    // Reset
+    (function attachReset(){
+      const btn=$("dmReset"); if(!btn) return;
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll("input, select").forEach(el=>{
+          if(el.tagName==="SELECT"){
+            const i=Array.from(el.options).findIndex(o=>o.defaultSelected);
+            el.selectedIndex = i>=0 ? i : 0;
+          } else { el.value = el.defaultValue; }
+        });
+        document.querySelectorAll("input, select").forEach(el=>{
+          el.dispatchEvent(new Event("input",{bubbles:true}));
+          el.dispatchEvent(new Event("change",{bubbles:true}));
+        });
+        try{ $("A").focus({preventScroll:true}); $("A").select(); }catch(e){}
+        render();
+      });
+    })();
+
+    // Start
+    const start = () => { 
+      try{
+        const A=$("A"), T=$("T"), C=$("C");
+        if(A && (!A.value || A.value === "")) A.value = A.getAttribute("value") || "10";
+        if(T && (!T.value || T.value === "")) T.value = T.getAttribute("value") || "0";
+        if(C && (!C.value || C.value === "")) C.value = C.getAttribute("value") || "0";
+      }catch(e){}
+      try{ $("A").focus({preventScroll:true}); $("A").select(); }catch(e){} 
+      render(); 
+    };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, {once:true});
+    else start();
+  })();
+  </script>
+
+  <div class="muted" style="text-align:center;margin:16px 0 0 0;">
+    This tool provides general portion and cost estimates for planning only. Results depend on the information you enter and typical averages. DinnerMath is not responsible for decisions, purchases, or outcomes based on these estimates.<br>
+    © 2025 DinnerMath. All rights reserved. Use for planning only.
+  </div>
+</body>
+</html>
