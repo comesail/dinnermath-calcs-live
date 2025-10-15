@@ -1,0 +1,352 @@
+<!doctype html>
+<!-- © 2025 DinnerMath — Calculator code and design are proprietary. Licensed for end-user viewing only via comesail.github.io. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DinnerMath — Corn Casserole / Corn Pudding Quantity Calculator (Tenderloin ultratight)</title>
+<meta name="description" content="How much corn casserole (corn pudding) per person? Estimate pans to make and pounds to prepare, with optional pricing.">
+<style>
+  :root{ --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --bg:#ffffff; --card:#ffffff; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+  .wrap{max-width:740px;margin:0 auto;padding:clamp(8px,1.6vw,14px)}
+  .dm-card{background:var(--card);border:1px solid var(--line);border-radius:0px;padding:10px;margin:8px 0;box-shadow:0 1px 0 rgba(17,24,39,.06),0 1px 2px rgba(17,24,39,.05)}
+  h1{font-size:20px;margin:0 0 6px;text-align:center;font-weight:800}
+  h3{font-size:15px;margin:0 0 6px;text-align:center;font-weight:800}
+  .lede{color:var(--muted);margin:0 0 8px;text-align:center;font-weight:400;font-size:12.5px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  @media (max-width:820px){.row{grid-template-columns:1fr}}
+  label{font-size:10.5px;color:#374151;display:block;margin:0 0 2px;font-weight:600;text-align:left}
+  input[type="number"],select{width:100%;border:1px solid #d1d5db;border-radius:7px;padding:6px 8px;font-size:12.5px;line-height:1.2;background:#fff;color:var(--ink)}
+  .muted{color:var(--muted);font-size:11px}
+  .fine{font-size:12.5px;color:#374151;line-height:1.35}
+  .inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .divider{height:1px;background:var(--line);margin:8px 0}
+  .btn{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:700;text-decoration:none;color:var(--ink);cursor:pointer;background:#fff}
+  .btn:hover{background:#f3f4f6}
+  .btn:focus-visible, .preset:focus-visible{outline:3px solid #94a3b8;outline-offset:2px}
+  .pill{font-size:10px;border:1px solid #d1d5db;border-radius:999px;padding:2px 6px;color:#475569;background:#fff;text-decoration:none}
+  .preset{border:2px solid var(--ink);background:#f8fafc;border-radius:999px;padding:5px 10px;font-size:13px;font-weight:800;cursor:pointer}
+  .preset:hover{background:#eef2f7}
+  .result{border:2px solid var(--ink);border-radius:0px;padding:10px;margin-top:6px;background:#fff}
+  .result .big{font-size:24px;font-weight:800;line-height:1.2;color:var(--ink);font-variant-numeric:tabular-nums}
+  .finder{padding:8px;border-radius:0px;border:2px solid var(--ink);background:#fff}
+  .visually-hidden{position:absolute!important;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;width:1px;overflow:hidden;white-space:nowrap;border:0;padding:0;margin:-1px}
+  [aria-label="Guests"]{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end}
+  [aria-label="Guests"]>div{flex:0 0 auto}
+  #A,#T,#C{width:110px}
+  [aria-label="Guests"]>div:nth-child(4){flex:1 1 240px;min-width:220px}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:820px){ .row-2{grid-template-columns:1fr} }
+  a, a:visited{color:var(--ink)}
+</style>
+</head>
+<body class="ultra">
+  <div class="wrap" id="corn-casserole">
+
+    <!-- Header -->
+    <div class="dm-card" role="region" aria-label="Header">
+      <h1>Corn Casserole / Corn Pudding Quantity Calculator — Pans per Person</h1>
+      <p class="lede">
+        Enter guests and settings (or tap a quick preset). We will estimate how many <strong>9×13 pans of casserole</strong> to make (planning estimate).
+      </p>
+    </div>
+
+    <!-- Inputs -->
+    <div class="dm-card" role="region" aria-label="Inputs">
+      <h3>Inputs</h3>
+      <div class="row" aria-label="Guests">
+        <div><label for="A">Adults</label><input id="A" type="number" min="0" step="1" inputmode="numeric" value="10" autofocus></div>
+        <div><label for="T">Teens</label><input id="T" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+        <div><label for="C">Children</label><input id="C" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+        <div>
+          <label for="course">Course mode</label>
+          <select id="course">
+            <option value="side" selected>Side dish</option>
+            <option value="mixed">Mixed buffet</option>
+            <option value="main">Vegetarian main</option>
+            <option value="app">Appetizer tasting</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" aria-label="Context">
+        <div>
+          <label for="length">Event length</label>
+          <select id="length">
+            <option value="0.95">Short - about 1 to 2 hours</option>
+            <option value="1.00" selected>Standard - about 2 to 3 hours</option>
+            <option value="1.08">Long - about 3 to 4 hours</option>
+            <option value="1.15">Extended - about 4 to 5 hours</option>
+          </select>
+        </div>
+        <div>
+          <label for="leftovers">Add leftovers</label>
+          <select id="leftovers">
+            <option value="1.00" selected>No</option>
+            <option value="1.10">+10%</option>
+            <option value="1.20">+20%</option>
+          </select>
+        </div>
+        <div>
+          <label for="appetite">Appetite</label>
+          <select id="appetite">
+            <option value="0.90">Light</option>
+            <option value="1.00" selected>Typical</option>
+            <option value="1.20">Hearty</option>
+          </select>
+        </div>
+        <div>
+          <label for="pan">Pan size (servings • lb per pan)</label>
+          <select id="pan">
+            <option value="2|6">8×8 — about 6 servings • about 2.0 lb</option>
+            <option value="4|12" selected>9×13 — about 12 servings • about 4.0 lb</option>
+            <option value="5.5|16">Deep 9×13 — about 16 servings • about 5.5 lb</option>
+            <option value="8|24">Half sheet 12×18 — about 24 servings • about 8.0 lb</option>
+          </select>
+          <div class="muted">We convert needed servings into pans and pounds using your selected pan size.</div>
+        </div>
+      </div>
+
+      <div class="inline" style="margin-top:6px">
+        <span class="muted">Quick presets:</span>
+        <button class="preset" data-people="10" type="button">10</button>
+        <button class="preset" data-people="25" type="button">25</button>
+        <button class="preset" data-people="50" type="button">50</button>
+        <button class="preset" data-people="100" type="button">100</button>
+        <span class="muted">Presets set all as adults. Tweak Teens and Children if needed.</span>
+        <div style="flex:1"></div>
+        <button id="dmReset" type="button" class="btn">Reset</button>
+      </div>
+    </div>
+
+    <!-- Micro-summary -->
+    <div class="muted" id="outMicro" style="margin:6px 0 0 0">-</div>
+
+    <!-- Results -->
+    <div class="dm-card" role="region" aria-label="Results" aria-live="polite" aria-atomic="true">
+      <h3>Results (estimate)</h3>
+      <div class="result">
+        <div class="muted" aria-hidden="true">Estimated pans to make</div>
+        <div class="big" id="outPans" aria-label="No estimate yet">-</div>
+        <div class="fine" id="outPounds">-</div>
+        <div class="fine" id="outFrom">-</div>
+        <div class="divider"></div>
+        <div class="inline">
+          <span class="pill" id="pillGuests">-</span>
+          <span class="pill" id="pillCourse">-</span>
+          <span class="pill" id="pillPan">-</span>
+          <span class="pill" id="pillPrice">pricing optional</span>
+        </div>
+      </div>
+      <span id="outGuests" class="visually-hidden">-</span>
+
+      <div class="row-2" style="margin-top:10px">
+        <div class="dm-card" style="margin:0">
+          <h3>Cost estimate</h3>
+          <div class="inline">
+            <div><label>Subtotal</label><div id="outSubtotal" class="fine">$-</div></div>
+            <div><label>Tax and fees</label><div id="outAdds" class="fine">$-</div></div>
+            <div><label>Estimated total</label><div id="outTotal" class="fine">$-</div></div>
+            <div><label>Per person</label><div id="outPPP" class="fine">$-</div></div>
+          </div>
+        </div>
+        <div class="dm-card finder" role="region" aria-label="Find near me" style="margin:0">
+          <div class="inline">
+            <a class="btn" href="#" onclick="try{window.open('https://www.google.com/maps/search/corn+casserole+near+me','_blank');}catch(e){location.href='https://www.google.com/maps/search/corn+casserole+near+me';}return false;">Find corn casserole near me</a>
+            <a class="pill" href="#" onclick="try{window.open('https://www.google.com/maps/search/catering','_blank');}catch(e){location.href='https://www.google.com/maps/search/catering';}return false;">Catering</a>
+            <a class="pill" href="#" onclick="try{window.open('https://www.google.com/maps/search/grocery+store','_blank');}catch(e){location.href='https://www.google.com/maps/search/grocery+store';}return false;">Grocery stores</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing (optional) -->
+    <div class="dm-card" role="region" aria-label="Pricing">
+      <h3>Pricing (optional)</h3>
+      <div class="row">
+        <div><label for="priceUnit">Unit price (US dollars per pound)</label><input id="priceUnit" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 2.49"></div>
+        <div><label for="taxPct">Sales tax (percent)</label><input id="taxPct" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g., 7.5"></div>
+        <div><label for="fees">Extra fees (US dollars)</label><input id="fees" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 6.00"></div>
+      </div>
+      <div class="muted">Cost = rounded pounds × unit price + tax + extra fees.</div>
+    </div>
+
+  </div>
+
+  <!-- Calculator logic (original IDs & math preserved; UI-only render) -->
+  <script>
+  (function(){
+    const $ = id => document.getElementById(id);
+    const N = (v,d=0)=>{const n=parseFloat(v);return isFinite(n)?n:d;};
+    const money = n => (isFinite(n)&&n>=0) ? "$"+n.toFixed(2) : "$-";
+    const roundQuarter = n => Math.round(n*4)/4;
+
+    const courseMult = c => (c==="side"?1.00:c==="mixed"?0.75:c==="main"?1.40:0.50);
+    const lenMult = v => (v==1.15?1.15:v==1.08?1.08:v==0.95?0.95:1.00);
+
+    function compute(){
+      const A=N($("A").value,0), T=N($("T").value,0), C=N($("C").value,0);
+      const guests = A+T+C;
+      const appetite=N($("appetite").value,1.0);
+      const leftovers=N($("leftovers").value,1.0);
+      const length=N($("length").value,1.0);
+      const course=$("course").value;
+
+      // base raw mix ounces per person (same as source)
+      const baseOz={adult:6.0, teen:5.0, child:3.5};
+      let oz = (A*baseOz.adult + T*baseOz.teen + C*baseOz.child);
+      oz *= courseMult(course) * appetite * lenMult(length) * leftovers;
+
+      // convert to pounds and quarter-round
+      const pounds = oz/16;
+      const rawRounded = roundQuarter(Math.max(0,pounds));
+
+      // pan mapping from select value "lbPerPan|servingsPerPan"
+      const [lbPerPanStr, servPerPanStr] = ($("pan").value||"4|12").split("|");
+      const lbPerPan = N(lbPerPanStr,4.0);
+      const pans = rawRounded>0 ? Math.ceil(rawRounded / lbPerPan) : 0;
+
+      // Pricing by pound
+      const price=N($("priceUnit").value,0), tax=N($("taxPct").value,0)/100, fees=N($("fees").value,0);
+      const subtotal = (price>0 && rawRounded>0) ? rawRounded*price : 0;
+      const adds = subtotal*tax + (fees>0?fees:0);
+      const total = subtotal + adds;
+      const ppp = (guests>0 && total>0) ? total/guests : NaN;
+
+      return {guests, rawRounded, pans, subtotal, adds, total, ppp, course};
+    }
+
+    function render(){
+      // Select-all on focus for A/T/C
+      ["A","T","C"].forEach(id=>{
+        const el=$(id);
+        if(el && !el._dmSel){ el._dmSel=true; el.addEventListener("focus",()=>{ try{ el.select(); }catch(e){} }); }
+      });
+
+      const s=compute();
+
+      // Big number and ARIA (pans)
+      $("outPans").textContent = s.guests>0 ? (s.pans>0 ? s.pans.toString() : "0") : "-";
+      $("outPans").setAttribute("aria-label", s.guests>0 ? ("Estimated pans to buy: " + (s.pans||0)) : "No estimate yet");
+
+      // Secondary line (pounds)
+      $("outPounds").textContent = s.guests>0 ? ("about " + s.rawRounded.toFixed(2).replace(/\.00$/,'') + " lb casserole") : "-";
+
+      // Micro-summary chips + from sentence
+      const appetiteTxt = $("appetite").selectedOptions[0].text.toLowerCase();
+      const lengthTxt = $("length").selectedOptions[0].text.toLowerCase();
+      const leftTxt = $("leftovers").selectedOptions[0].text.toLowerCase();
+      const courseTxt = (s.course==="side"?"side dish": s.course==="mixed"?"mixed buffet": s.course==="main"?"vegetarian main":"appetizer tasting");
+      const panTxt = $("pan").selectedOptions[0].text.toLowerCase();
+
+      $("outMicro").textContent = s.guests>0
+        ? (s.guests + " guests • " + courseTxt + " • " + appetiteTxt + " appetite • " + lengthTxt + " • leftovers " + leftTxt + " • " + panTxt)
+        : "-";
+
+      $("outFrom").textContent = s.guests>0
+        ? ("Estimated from " + s.guests + " guests - " + courseTxt + ", " + appetiteTxt + " appetite, " + lengthTxt + ", leftovers " + leftTxt + ", " + panTxt + ".")
+        : "-";
+
+      $("outGuests").textContent = s.guests>0 ? String(s.guests) : "-";
+      $("pillGuests").textContent = s.guests>0 ? (s.guests + " guests total") : "-";
+      $("pillCourse").textContent = s.guests>0 ? courseTxt : "-";
+      $("pillPan").textContent    = s.guests>0 ? panTxt : "-";
+
+      // Pricing outputs
+      $("outSubtotal").textContent = s.subtotal>0 ? money(s.subtotal) : "$-";
+      $("outAdds").textContent     = s.subtotal>0 ? money(s.adds) : "$-";
+      $("outTotal").textContent    = s.subtotal>0 ? money(s.total) : "$-";
+      $("outPPP").textContent      = (s.total>0 && s.guests>0) ? money(s.ppp) : "$-";
+      $("pillPrice").textContent   = (s.total>0 && s.guests>0) ? ("about " + money(s.ppp) + " per person") : "pricing optional";
+      // Oversized pan note (minimum batch size)
+      try{
+        // Prefer parsing from the option text: "... • about X lb"
+        const opt = (document.getElementById("pan")||{}).selectedOptions?.[0]?.text || "";
+        let lbPerPan = 0;
+        const m = opt.match(/about\s+([\d.]+)\s*lb/i);
+        if(m){ lbPerPan = parseFloat(m[1]); }
+        // Fallback: parse from the value like "4|12" or "12|4"
+        if(!lbPerPan){
+          const panVal = (document.getElementById("pan")||{}).value||"";
+          const parts = panVal.split("|").map(x => parseFloat(x)).filter(v => !isNaN(v));
+          if(parts.length===2){
+            // pounds is typically the smaller one (e.g., 4|12), but be defensive:
+            // choose the one <= 12 or the smaller of the two.
+            const cand = parts.filter(v => v <= 12);
+            lbPerPan = cand.length ? cand[0] : Math.min(parts[0], parts[1]);
+          } else if(parts.length===1){
+            lbPerPan = parts[0];
+          }
+        }
+        if(s.pans===1 && lbPerPan && lbPerPan >= (s.rawRounded*1.5)){
+          const panName = opt.split(" — ")[0]?.toLowerCase() || "pan";
+          const extra = " Minimum batch size: one " + panName + " makes about " + (Math.round(lbPerPan*100)/100) + " lb, which is more than you need — leftovers expected.";
+          const curEl = document.getElementById("outFrom");
+          if(curEl){
+            const cur = curEl.textContent || "";
+            curEl.textContent = (cur.trim() + (cur ? " " : "") + extra).trim();
+          }
+        }
+      }catch(e){}
+
+}
+
+    ["A","T","C","course","length","leftovers","appetite","pan","priceUnit","taxPct","fees"].forEach(id=>{
+      const el=$(id); if(el){el.addEventListener("input",render); el.addEventListener("change",render);}
+    });
+
+    // Presets
+    document.querySelectorAll(".preset[data-people]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const n=parseInt(btn.getAttribute("data-people"),10)||0;
+        $("A").value=n; $("T").value=0; $("C").value=0;
+        const a=$("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){}
+        render();
+      });
+    });
+
+    // Reset
+    (function attachReset(){
+      const btn = $("dmReset");
+      if(!btn) return;
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll("input, select").forEach(el=>{
+          if(el.tagName==="SELECT"){
+            const i=Array.from(el.options).findIndex(o=>o.defaultSelected);
+            el.selectedIndex = i>=0 ? i : 0;
+          } else { el.value = el.defaultValue; }
+        });
+        document.querySelectorAll("input, select").forEach(el=>{
+          el.dispatchEvent(new Event("input",{bubbles:true}));
+          el.dispatchEvent(new Event("change",{bubbles:true}));
+        });
+        const a=$("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){}
+        render();
+      });
+    })();
+
+    // Start with defaults and first render
+    const start = () => { 
+      try{
+        const A=document.getElementById("A"), T=document.getElementById("T"), C=document.getElementById("C");
+        if(A && (!A.value || A.value === "")) A.value = A.getAttribute("value") || "10";
+        if(T && (!T.value || T.value === "")) T.value = T.getAttribute("value") || "0";
+        if(C && (!C.value || C.value === "")) C.value = C.getAttribute("value") || "0";
+      }catch(e){}
+      const a=document.getElementById("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){} 
+      render(); 
+    };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, {once:true});
+    else start();
+  })();
+  </script>
+
+  <div class="muted" style="text-align:center;margin:16px 0 0 0;">
+    This tool provides general portion and cost estimates for planning only. Results depend on the information you enter and typical averages. DinnerMath is not responsible for decisions, purchases, or outcomes based on these estimates.<br>
+    © 2025 DinnerMath. All rights reserved. Use for planning only.
+  </div>
+</body>
+</html>
