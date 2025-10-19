@@ -1,0 +1,305 @@
+<!doctype html>
+<!-- © 2025 DinnerMath — Calculator code and design are proprietary. Licensed for end-user viewing only via comesail.github.io. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DinnerMath — Leg of Lamb Quantity Calculator (Tenderloin ultratight, simplified)</title>
+<meta name="description" content="How much leg of lamb per person? Estimate how many pounds of raw leg of lamb to buy and how many cooked pounds it will yield — with optional pricing.">
+<style>
+  :root{ --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --bg:#ffffff; --card:#ffffff; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+  .wrap{max-width:740px;margin:0 auto;padding:clamp(8px,1.6vw,14px)}
+  .dm-card{background:var(--card);border:1px solid var(--line);border-radius:0px;padding:10px;margin:8px 0;box-shadow:0 1px 0 rgba(17,24,39,.06),0 1px 2px rgba(17,24,39,.05)}
+  h1{font-size:20px;margin:0 0 6px;text-align:center;font-weight:800}
+  h3{font-size:15px;margin:0 0 6px;text-align:center;font-weight:800}
+  .lede{color:var(--muted);margin:0 0 8px;text-align:center;font-weight:400;font-size:12.5px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  @media (max-width:820px){.row{grid-template-columns:1fr}}
+  label{font-size:10.5px;color:#374151;display:block;margin:0 0 2px;font-weight:600;text-align:left}
+  input[type="number"],select{width:100%;border:1px solid #d1d5db;border-radius:7px;padding:6px 8px;font-size:12.5px;line-height:1.2;background:#fff;color:var(--ink)}
+  .muted{color:var(--muted);font-size:11px}
+  .fine{font-size:12.5px;color:#374151;line-height:1.35}
+  .inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .divider{height:1px;background:var(--line);margin:8px 0}
+  .btn{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:700;text-decoration:none;color:var(--ink);cursor:pointer;background:#fff}
+  .btn:hover{background:#f3f4f6}
+  .btn:focus-visible, .preset:focus-visible{outline:3px solid #94a3b8;outline-offset:2px}
+  .pill{font-size:10px;border:1px solid #d1d5db;border-radius:999px;padding:2px 6px;color:#475569;background:#fff;text-decoration:none}
+  .preset{border:2px solid var(--ink);background:#f8fafc;border-radius:999px;padding:5px 10px;font-size:13px;font-weight:800;cursor:pointer}
+  .result{border:2px solid var(--ink);border-radius:0px;padding:10px;margin-top:6px;background:#fff}
+  .result .big{font-size:24px;font-weight:800;line-height:1.2;color:var(--ink);font-variant-numeric:tabular-nums}
+  .finder{padding:8px;border-radius:0px;border:2px solid var(--ink);background:#fff}
+  .visually-hidden{position:absolute!important;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;width:1px;overflow:hidden;white-space:nowrap;border:0;padding:0;margin:-1px}
+  [aria-label="Guests"]{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end}
+  [aria-label="Guests"]>div{flex:0 0 auto}
+  #A,#T,#C{width:110px}
+  [aria-label="Guests"]>div:nth-child(4){flex:1 1 240px;min-width:220px}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:820px){ .row-2{grid-template-columns:1fr} }
+  a, a:visited{color:var(--ink)}
+</style>
+</head>
+<body class="ultra">
+  <div class="wrap" id="leg-of-lamb">
+
+    <div class="dm-card" role="region" aria-label="Header">
+      <h1>Leg of Lamb — Quantity Calculator (How Much per Person)</h1>
+      <p class="lede">
+        Enter guests and settings (or tap a quick preset). We will estimate how many <strong>pounds of raw leg of lamb</strong> to buy (planning estimate) and how many cooked pounds it will yield.
+      </p>
+    </div>
+
+    <div class="dm-card" role="region" aria-label="Inputs">
+      <h3>Inputs</h3>
+      <div class="row" aria-label="Guests">
+        <div><label for="A">Adults</label><input id="A" type="number" min="0" step="1" inputmode="numeric" value="10" autofocus></div>
+        <div><label for="T">Teens</label><input id="T" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+        <div><label for="C">Children</label><input id="C" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+        <div>
+          <label for="course">Course mode</label>
+          <select id="course">
+            <option value="main" selected>Main dish</option>
+            <option value="mixed">Mixed buffet</option>
+            <option value="app">Appetizer/snack</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" aria-label="Context">
+        <div>
+          <label for="cut">Cut style</label>
+          <select id="cut">
+            <option value="bonein" selected>Bone-in (about 35% shrink)</option>
+            <option value="semi">Semi-boneless (about 30% shrink)</option>
+            <option value="boneless">Boneless (about 25% shrink)</option>
+          </select>
+          <div class="muted">We convert cooked ounces to raw pounds using the cut’s typical yield.</div>
+        </div>
+        <div>
+          <label for="appetite">Appetite</label>
+          <select id="appetite">
+            <option value="0.90">Light</option>
+            <option value="1.00" selected>Typical</option>
+            <option value="1.20">Hearty</option>
+          </select>
+        </div>
+        <div>
+          <label for="length">Event length</label>
+          <select id="length">
+            <option value="0.95">Short - about 1 to 2 hours</option>
+            <option value="1.00" selected>Standard - about 2 to 3 hours</option>
+            <option value="1.08">Long - about 3 to 4 hours</option>
+            <option value="1.15">Extended - about 4 to 5 hours</option>
+          </select>
+        </div>
+        <div>
+          <label for="leftovers">Add leftovers</label>
+          <select id="leftovers">
+            <option value="1.00" selected>No</option>
+            <option value="1.10">+10%</option>
+            <option value="1.20">+20%</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="inline" style="margin-top:6px">
+        <span class="muted">Quick presets:</span>
+        <button class="preset" data-people="10" type="button">10</button>
+        <button class="preset" data-people="25" type="button">25</button>
+        <button class="preset" data-people="50" type="button">50</button>
+        <button class="preset" data-people="100" type="button">100</button>
+        <span class="muted">Presets set all as adults. Tweak Teens and Children if needed.</span>
+        <div style="flex:1"></div>
+        <button id="dmReset" type="button" class="btn">Reset</button>
+      </div>
+    </div>
+
+    <div class="muted" id="outMicro" style="margin:6px 0 0 0">-</div>
+
+    <div class="dm-card" role="region" aria-label="Results" aria-live="polite" aria-atomic="true">
+      <h3>Results (estimate)</h3>
+      <div class="result">
+        <div class="muted" aria-hidden="true">Estimated raw pounds to buy</div>
+        <div class="big" id="outRaw" aria-label="No estimate yet">-</div>
+        <div class="fine" id="outFrom">-</div>
+        <div class="fine" id="outExplain">Enter your guest mix to calculate.</div>
+        <div class="divider"></div>
+        <div class="inline">
+          <span class="pill" id="pillGuests">-</span>
+          <span class="pill" id="pillCut">-</span>
+          <span class="pill" id="pillPrice">pricing optional</span>
+        </div>
+      </div>
+      <span id="outGuests" class="visually-hidden">-</span>
+
+      <div class="row-2" style="margin-top:10px">
+        <div class="dm-card" style="margin:0">
+          <h3>Cost estimate</h3>
+          <div class="inline">
+            <div><label>Subtotal</label><div id="outSubtotal" class="fine">$-</div></div>
+            <div><label>Tax and fees</label><div id="outAdds" class="fine">$-</div></div>
+            <div><label>Estimated total</label><div id="outTotal" class="fine">$-</div></div>
+            <div><label>Per person</label><div id="outPPP" class="fine">$-</div></div>
+          </div>
+        </div>
+        <div class="dm-card finder" role="region" aria-label="Find near me" style="margin:0">
+          <div class="inline">
+            <a class="btn" href="#" onclick="try{window.open('https://www.google.com/maps/search/leg+of+lamb+near+me','_blank');}catch(e){location.href='https://www.google.com/maps/search/leg+of+lamb+near+me';}return false;">Find leg of lamb near me</a>
+            <a class="pill" href="#" onclick="try{window.open('https://www.google.com/maps/search/butcher+shop','_blank');}catch(e){location.href='https://www.google.com/maps/search/butcher+shop';}return false;">Butcher shops</a>
+            <a class="pill" href="#" onclick="try{window.open('https://www.google.com/maps/search/grocery+store','_blank');}catch(e){location.href='https://www.google.com/maps/search/grocery+store';}return false;">Grocery stores</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dm-card" role="region" aria-label="Pricing">
+      <h3>Pricing (optional)</h3>
+      <div class="row">
+        <div><label for="priceLb">Unit price (US dollars per pound)</label><input id="priceLb" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 9.99"></div>
+        <div><label for="taxPct">Sales tax (percent)</label><input id="taxPct" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g., 7.5"></div>
+        <div><label for="fees">Extra fees (US dollars)</label><input id="fees" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 8.00"></div>
+      </div>
+      <div class="muted">Cost = rounded raw pounds × unit price + tax + extra fees.</div>
+    </div>
+
+  </div>
+
+  <script>
+  (function(){
+    const $ = id => document.getElementById(id);
+    const N = (v,d=0)=>{const n=parseFloat(v);return isFinite(n)?n:d;};
+    const money = n => (isFinite(n)&&n>=0) ? "$"+n.toFixed(2) : "$-";
+    const fmt = (n,d=0)=> isFinite(n) ? n.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}) : "-";
+    const roundQtr = lbs => Math.round(lbs*4)/4;
+
+    function cookedPerAdultOz(course){
+      if(course==="main")  return {adult:8.0, teen:6.5, child:4.8};
+      if(course==="mixed") return {adult:6.0, teen:4.8, child:3.6};
+      return                {adult:3.5, teen:2.8, child:2.1};
+    }
+    function yieldForCut(c){
+      if(c==="boneless") return 0.75;
+      if(c==="semi") return 0.70;
+      return 0.65;
+    }
+
+    function compute(){
+      const A=N($("A").value,0), T=N($("T").value,0), C=N($("C").value,0);
+      const guests = A+T+C;
+
+      const course = $("course").value;
+      const cut = $("cut").value;
+      const appetite = N($("appetite").value,1.0);
+      const length   = N($("length").value,1.0);
+      const leftovers= N($("leftovers").value,1.0);
+
+      const base = cookedPerAdultOz(course);
+      let cookedOz = (A*base.adult + T*base.teen + C*base.child);
+      cookedOz *= appetite * length * leftovers;
+
+      const cookedLb = cookedOz/16;
+      const yieldFactor = yieldForCut(cut);
+      const rawLb = (yieldFactor>0) ? (cookedLb / yieldFactor) : 0;
+
+      const rawRounded = roundQtr(Math.max(0, rawLb));
+
+      const p = N($("priceLb").value,0);
+      const tax = N($("taxPct").value,0)/100;
+      const fees = N($("fees").value,0);
+      const subtotal = (p>0 && rawRounded>0) ? rawRounded * p : 0;
+      const adds = subtotal * tax + (fees>0?fees:0);
+      const total = subtotal + adds;
+      const ppp = (guests>0 && total>0) ? total/guests : NaN;
+
+      return {guests, rawRounded, cookedLb, subtotal, adds, total, ppp, course, cut, appetite, length, leftovers};
+    }
+
+    function render(){
+      const s = compute();
+
+      const courseTxt = s.course==="main" ? "main dish" : s.course==="mixed" ? "mixed buffet" : "appetizer/snack";
+      const cutTxt = s.cut==="boneless" ? "boneless (about 25% shrink)" : s.cut==="semi" ? "semi-boneless (about 30% shrink)" : "bone-in (about 35% shrink)";
+      const appetiteTxt = (document.getElementById("appetite").options[document.getElementById("appetite").selectedIndex]||{}).text.toLowerCase();
+      const lengthTxt = (document.getElementById("length").options[document.getElementById("length").selectedIndex]||{}).text.toLowerCase();
+      const leftTxt = (document.getElementById("leftovers").options[document.getElementById("leftovers").selectedIndex]||{}).text.toLowerCase();
+
+      document.getElementById("outMicro").textContent = s.guests>0
+        ? (s.guests + " guests • " + courseTxt + " • " + appetiteTxt + " appetite • " + lengthTxt + " • leftovers " + leftTxt + " • " + cutTxt)
+        : "-";
+
+      const rawTxt = (s.rawRounded>0) ? fmt(s.rawRounded, (s.rawRounded%1)?2:0) + " lb" : "-";
+      const cookedTxt = (s.cookedLb>0) ? ("about " + fmt(s.cookedLb,1) + " lb cooked") : "-";
+
+      const big = $("outRaw");
+      big.textContent = rawTxt;
+      big.setAttribute("aria-label", s.rawRounded>0 ? ("Estimated pounds to buy: " + s.rawRounded) : "No estimate yet");
+
+      $("outFrom").textContent = s.guests>0
+        ? ("Estimated from " + s.guests + " guests, " + courseTxt + ", " + appetiteTxt + " appetite, " + lengthTxt + ", leftovers " + leftTxt + ", " + cutTxt + ".")
+        : "-";
+      $("outExplain").textContent = s.guests>0 ? cookedTxt : "Enter your guest mix to calculate.";
+
+      $("outGuests").textContent = s.guests>0 ? String(s.guests) : "-";
+      $("outSubtotal").textContent = s.subtotal>0 ? money(s.subtotal) : "$-";
+      $("outAdds").textContent     = s.subtotal>0 ? money(s.adds) : "$-";
+      $("outTotal").textContent    = s.subtotal>0 ? money(s.total) : "$-";
+      $("outPPP").textContent      = (s.total>0 && s.guests>0) ? money(s.ppp) : "$-";
+
+      $("pillGuests").textContent = s.guests>0 ? (s.guests + " guests total") : "-";
+      $("pillCut").textContent = s.guests>0 ? cutTxt : "-";
+      $("pillPrice").textContent  = (s.total>0 && s.guests>0) ? ("about " + money(s.ppp) + " per person") : "pricing optional";
+    }
+
+    ["A","T","C","course","length","leftovers","appetite","cut","priceLb","taxPct","fees"].forEach(id=>{
+      const el=$(id); if(el){el.addEventListener("input",render); el.addEventListener("change",render);}
+    });
+
+    ["A","T","C"].forEach(id=>{
+      const el=$(id); if(!el) return;
+      ["focus","click"].forEach(evt=>el.addEventListener(evt,()=>{ try{ el.select(); }catch(e){} }, {passive:true}));
+    });
+
+    document.querySelectorAll(".preset[data-people]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const n=parseInt(btn.getAttribute("data-people"),10)||0;
+        $("A").value=n; $("T").value=0; $("C").value=0;
+        const a=$("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){}
+        render();
+      });
+    });
+
+    (function attachReset(){
+      const btn = $("dmReset");
+      if(!btn) return;
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll("input, select").forEach(el=>{
+          if(el.tagName==="SELECT"){
+            const i=Array.from(el.options).findIndex(o=>o.defaultSelected);
+            el.selectedIndex = i>=0 ? i : 0;
+          } else { el.value = el.defaultValue; }
+        });
+        document.querySelectorAll("input, select").forEach(el=>{
+          el.dispatchEvent(new Event("input",{bubbles:true}));
+          el.dispatchEvent(new Event("change",{bubbles:true}));
+        });
+        const a=$("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){}
+        render();
+      });
+    })();
+
+    const start = () => { const a=document.getElementById("A"); try{ a.focus({preventScroll:true}); a.select(); }catch(e){} render(); };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, {once:true});
+    else start();
+  })();
+  </script>
+
+  <div class="muted" style="text-align:center;margin:16px 0 0 0;">
+    This tool provides general portion and cost estimates for planning only. Results depend on the information you enter and typical averages.
+    DinnerMath is not responsible for decisions, purchases, or outcomes based on these estimates.<br>
+    © 2025 DinnerMath. All rights reserved. Use for planning only.
+  </div>
+</body>
+</html>
